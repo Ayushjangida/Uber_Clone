@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (ParseUser.getCurrentUser() != null) {
+            transitionActivity();
+        }
+
         edtUsername = findViewById(R.id.edt_username_main);
         edtPassword = findViewById(R.id.edt_password_main);
         edtDriverOrPassenger = findViewById(R.id.edt_driver_or_passenger_main);
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             public void done(ParseException e) {
                                 if (e == null)  {
                                     Toast.makeText(getApplicationContext(), "Signup successfull", Toast.LENGTH_SHORT).show();
+                                    transitionActivity();
                                 }
                             }
                         });
@@ -121,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         public void done(ParseUser user, ParseException e) {
                             if (user != null && e == null)  {
                                 Toast.makeText(getApplicationContext(), "logged in successfully", Toast.LENGTH_SHORT).show();
+                                transitionActivity();
                             }
                         }
                     });
@@ -128,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_one_time_login_main :
-                if (edtDriverOrPassenger.getText().toString().equals("driver") || edtDriverOrPassenger.getText().toString().equals("passenger")) {
+                if (edtDriverOrPassenger.getText().toString().equals("Driver") || edtDriverOrPassenger.getText().toString().equals("Passenger")) {
                     if (ParseUser.getCurrentUser() == null) {
                         ParseAnonymousUtils.logIn(new LogInCallback() {
                             @Override
@@ -137,7 +143,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     Toast.makeText(getApplicationContext(), "succefully logged in", Toast.LENGTH_SHORT).show();
 
                                     user.put("as", edtDriverOrPassenger.getText().toString());
-                                    user.saveInBackground();
+                                    user.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null)  {
+                                                transitionActivity();
+                                            }
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -147,5 +160,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
         }
+    }
+
+    private void transitionActivity() {
+       if (ParseUser.getCurrentUser() != null)  {
+           if (ParseUser.getCurrentUser().get("as").equals("Passenger"))    {
+                Intent intent = new Intent(MainActivity.this, PassengerActivity.class);
+                startActivity(intent);
+                finish();
+           }
+       }
     }
 }
