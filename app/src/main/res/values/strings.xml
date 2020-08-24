@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Uber Clone</string>
+    <string name="txt_no_signup_or_login">Do not want to Sign up or Login</string>
+</resources>
